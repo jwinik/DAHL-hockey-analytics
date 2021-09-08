@@ -1,0 +1,400 @@
+---
+title: "Fantasy Hockey Analytics Week 6"
+author: "Jason Winik"
+date: "2/22/2021"
+output: pdf_document
+---
+
+```{r setup, echo = FALSE, results = 'hide', warning = FALSE, message=FALSE}
+setwd("C:/Users/jwini/OneDrive/Documents/Hockey_Stats/Fantasy Analytics/Week 6")
+library(tidyverse)
+fantasyteams <- read.csv("Fantasy Teams 2.21.csv")
+# Total Weekly Points downloaded from NST
+week6.pts <- read.csv("NST week 6.csv")
+# Weekly Powerplay Points. Same data set as above filtered for PP and removing everything but PP Points.
+week6.pp <- read.csv("NST week 6 PP.csv")
+week6.pp.clean <- week6.pp %>%
+  select(Player, Goals, Total.Assists, Total.Points) %>%
+  rename(PP.Goals = Goals,
+         PP.Assists = Total.Assists,
+         PP.Points = Total.Points)
+colnames(week6.pp.clean) <- c("Player",
+                              "PP.Goals",
+                              "PP.Assists",
+                              "PP.Points")
+# Weekly Shorthanded Points. Same data set as above filtered for PP and removing everything but PP Points.
+week6.sh <- read.csv("NST week 6 SH.csv")
+week6.sh.clean <- week6.sh %>%
+  select(Player, Team, Goals, Total.Assists, Total.Points)
+colnames(week6.sh.clean) <- c("Player",
+                              "Team",
+                              "SH.Goals",
+                              "SH.Assists",
+                              "SH.Points")
+## Merge Regular Stats, PP, and SH
+week6.ppsh <- merge(week6.pp.clean, week6.sh.clean, by = 'Player', all = TRUE)
+week6.pts.total <- merge(week6.pts, week6.ppsh, by = 'Player', all = TRUE)
+week6.pts.total[is.na(week6.pts.total)] <- 0
+
+
+## Merge week 6 stats and fantasy names
+week6 <- merge(week6.pts.total, fantasyteams, by = 'Player', all = TRUE)
+
+# Weekly Player Fantasy Points
+## Note this does NOT include hat tricks
+week6 <- week6 %>%
+  mutate(Goals.f = Goals * 4) %>%
+  mutate(Assists.f = Total.Assists * 2) %>%
+  mutate(PPP.f = PP.Points * 1) %>%
+  mutate(SHP.f = SH.Points * 1) %>%
+  mutate(SOG.f = Shots * .15) %>%
+  mutate(HIT.f = Hits * .15) %>%
+  mutate(BLK.f = Shots.Blocked * .2) %>%
+  mutate(TOTAL.F = (Goals.f +
+                         Assists.f + 
+                         PPP.f + 
+                         SHP.f + 
+                         SOG.f +
+                         HIT.f +
+                         BLK.f))
+week6[is.na(week6)] <- 0
+```
+
+
+```{r,echo=FALSE}
+week6.noFA <- week6 %>%
+  filter(Team != 0)
+## Team Fantasy Points
+week6.noFA %>%
+  group_by(Team) %>%
+  summarise('Fantasy Points' = sum(TOTAL.F))
+
+
+
+#Goals vs Expected Goals
+
+xG_week6 <- week6.noFA %>%
+  group_by(Team) %>%
+  summarise('Total Goals' = sum(Goals),
+            'G/Skater' = mean(Goals),
+            'TOTAL ixG' = sum(ixG),
+            'ixG/Skater' = mean(ixG),
+            'G - ixG' = sum(Goals) - sum(ixG))
+xG_week6
+write.csv(xG_week6, file = "xG_week6.csv")
+
+```
+Note that that these are just player stats (not including goalies) and are calculating weekly points based on if you had the same players as of Sunday night. 
+
+# Week 6 All Teams
+```{r, echo = FALSE}
+##scatterplot Fantasy Points per xG
+week6.noFA <- week6 %>%
+  filter(Team != 0)
+
+ggplot(week6.noFA, aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals")
+ggplot(week6.noFA, aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI")
+ggplot(week6.noFA, aes(x = Goals, y = ixG, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals")
+
+```
+
+# Individual Team Stats - TB12 West
+## Trading Block Tony
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Jason Winik')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Jason Winik', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Jason Winik')%>%  
+ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Jason Winik', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Jason Winik')%>%
+ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Jason Winik', as.character(Player),'')), hjust = "inward", vjust = "inward")
+
+```
+
+## That Hoser Over There
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Gaurav Shastri')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Gaurav Shastri', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Gaurav Shastri')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Gaurav Shastri', as.character(Player),'')), hjust = "inward", vjust = "inward")
+
+week6.noFA %>%
+  filter(Owner == 'Gaurav Shastri')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Gaurav Shastri', as.character(Player),'')), hjust = "inward", vjust = "inward")
+
+```
+
+## Team Ginsberg
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Brandon Ginsberg')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Brandon Ginsberg', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Brandon Ginsberg')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Brandon Ginsberg', as.character(Player),'')), hjust = "inward", vjust = "inward")
+
+week6.noFA %>%
+  filter(Owner == 'Brandon Ginsberg')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Brandon Ginsberg', as.character(Player),'')), hjust = "inward", vjust = "inward")
+
+```
+
+## Team Hector
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Markus Hector')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Markus Hector', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Markus Hector')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Markus Hector', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Markus Hector')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Markus Hector', as.character(Player),'')), hjust = "inward", vjust = "inward")
+```
+
+## Esther Island Esthers
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Benton Croop')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Benton Croop', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Benton Croop')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Benton Croop', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Benton Croop')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Benton Croop', as.character(Player),'')), hjust = "inward", vjust = "inward")
+
+```
+
+# Individual Team Stats - ExxonMobil East Division}
+## Vasili's Pod Squad
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Will Klajbor')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Will Klajbor', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Will Klajbor')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Will Klajbor', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Will Klajbor')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Will Klajbor', as.character(Player),'')), hjust = "inward", vjust = "inward")
+
+```
+
+## Baltimore Bandits
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Nick Arnold')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Nick Arnold', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Nick Arnold')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Nick Arnold', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Nick Arnold')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Nick Arnold', as.character(Player),'')), hjust = "inward", vjust = "inward")
+```
+
+## Laussanne Automatons
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Alex Rusnak')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Alex Rusnak', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Alex Rusnak')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Alex Rusnak', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Alex Rusnak')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Alex Rusnak', as.character(Player),'')), hjust = "inward", vjust = "inward")
+```
+
+## Brown Shoes w/ a Black Belt?
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Patrick Jefferson')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Patrick Jefferson', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Patrick Jefferson')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Patrick Jefferson', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Patrick Jefferson')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Patrick Jefferson', as.character(Player),'')), hjust = "inward", vjust = "inward")
+```
+
+## Wayne County Firepucks
+```{r, echo = FALSE}
+week6.noFA %>%
+  filter(Owner == 'Thomas Clark')%>%
+  ggplot(aes(x = TOTAL.F, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per Expected Goals",
+       x = "Fantasy Points",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Thomas Clark', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Thomas Clark')%>%
+  ggplot(aes(x = TOTAL.F, y = TOI, color = Team))+
+  geom_point() +
+  labs(title = "Week 6 Fantasy Points per TOI",
+       x = "Fantasy Points",
+       y = "TOI") +
+  geom_text(aes(label = ifelse(Owner == 'Thomas Clark', as.character(Player),'')), hjust = "inward", vjust = "inward")
+week6.noFA %>%
+  filter(Owner == 'Thomas Clark')%>%
+  ggplot(aes(x = Goals, y = ixG, color = Team, label = Player))+
+  geom_point() +
+  labs(title = "Week 6 Goals vs Expected Goals",
+       x = "Goals",
+       y = "Expected Goals") +
+  geom_text(aes(label = ifelse(Owner == 'Thomas Clark', as.character(Player),'')), hjust = "inward", vjust = "inward")
+```

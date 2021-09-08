@@ -1,0 +1,283 @@
+---
+title: "DAHL Week 13"
+author: "Jason Winik"
+date: "4/12/2021"
+output: pdf_document
+---
+
+```{r, echo=FALSE, warning=FALSE}
+library(tidyverse)
+library(writexl)
+setwd("C:/Users/jwini/OneDrive/Documents/Hockey_Stats/Fantasy Analytics")
+points <- read.csv("standings_2021.csv")
+```
+
+```{r, echo= FALSE, warning= FALSE}
+week1 <- points %>%
+  rename(week1 = week,
+         fp_for1 = fp_for,
+         fp_against1 = fp_against,
+         Opponent1 = Opponent) %>%
+  mutate(PD1 = fp_for1 - fp_against1) %>%
+  mutate(PD_percent1 = PD1 / fp_for1) %>%
+  mutate(record1 = ifelse(fp_for1 > fp_against1, "W", "L")) %>%
+  filter(week1 == 1) %>%
+  mutate(rank1 = rank(desc(fp_for1)))
+
+week2 <- points %>%
+  rename(week2 = week,
+         fp_for2 = fp_for,
+         fp_against2 = fp_against,
+         Opponent2 = Opponent) %>%
+  mutate(PD2 = fp_for2 - fp_against2) %>%
+  mutate(PD_percent2 = PD2 / fp_for2) %>%
+  mutate(record2 = ifelse(fp_for2 > fp_against2, "W", "L")) %>%
+  filter(week2 == 2) %>%
+  mutate(rank2 = rank(desc(fp_for2)))
+
+week3 <- points %>%
+  rename(week3 = week,
+         fp_for3 = fp_for,
+         fp_against3 = fp_against,
+         Opponent3 = Opponent) %>%
+  mutate(PD3 = fp_for3 - fp_against3) %>%
+  mutate(PD_percent3 = PD3 / fp_for3) %>%
+  mutate(record3 = ifelse(fp_for3 > fp_against3, "W", "L")) %>%
+  filter(week3 == 3) %>%
+  mutate(rank3 = rank(desc(fp_for3)))
+
+week4 <- points %>%
+  rename(week4 = week,
+         fp_for4 = fp_for,
+         fp_against4 = fp_against,
+         Opponent4 = Opponent) %>%
+  mutate(PD4 = fp_for4 - fp_against4) %>%
+  mutate(PD_percent4 = PD4 / fp_for4) %>%
+  mutate(record4 = ifelse(fp_for4 > fp_against4, "W", "L")) %>%
+  filter(week4 == 4) %>%
+  mutate(rank4 = rank(desc(fp_for4)))
+
+week5 <- points %>%
+  rename(week5 = week,
+         fp_for5 = fp_for,
+         fp_against5 = fp_against,
+         Opponent5 = Opponent) %>%
+  mutate(PD5 = fp_for5 - fp_against5) %>%
+  mutate(PD_percent5 = PD5 / fp_for5) %>%
+  mutate(record5 = ifelse(fp_for5 > fp_against5, "W", "L")) %>%
+  filter(week5 == 5) %>%
+  mutate(rank5 = rank(desc(fp_for5)))
+
+week6 <- points %>%
+  rename(week6 = week,
+         fp_for6 = fp_for,
+         fp_against6 = fp_against,
+         Opponent6 = Opponent) %>%
+  mutate(PD6 = fp_for6 - fp_against6) %>%
+  mutate(PD_percent6 = PD6 / fp_for6) %>%
+  mutate(record6 = ifelse(fp_for6 > fp_against6, "W", "L")) %>%
+  filter(week6 == 6) %>%
+  mutate(rank6 = rank(desc(fp_for6)))
+
+week7 <- points %>%
+  rename(week7 = week,
+         fp_for7 = fp_for,
+         fp_against7 = fp_against,
+         Opponent7 = Opponent) %>%
+  mutate(PD7 = fp_for7 - fp_against7) %>%
+  mutate(PD_percent7 = PD7 / fp_for7) %>%
+  mutate(record7 = ifelse(fp_for7 > fp_against7, "W", "L")) %>%
+  filter(week7 == 7) %>%
+  mutate(rank7 = rank(desc(fp_for7)))
+
+week8 <- points %>%
+  rename(week8 = week,
+         fp_for8 = fp_for,
+         fp_against8 = fp_against,
+         Opponent8 = Opponent) %>%
+  mutate(PD8 = fp_for8 - fp_against8) %>%
+  mutate(PD_percent8 = PD8 / fp_for8) %>%
+  mutate(record8 = ifelse(fp_for8 > fp_against8, "W", "L")) %>%
+  filter(week8 == 8) %>%
+  mutate(rank8 = rank(desc(fp_for8)))
+
+week9 <- points %>%
+  rename(week9 = week,
+         fp_for9 = fp_for,
+         fp_against9 = fp_against,
+         Opponent9 = Opponent) %>%
+  mutate(PD9 = fp_for9 - fp_against9) %>%
+  mutate(PD_percent9 = PD9 / fp_for9) %>%
+  mutate(record9 = ifelse(fp_for9 > fp_against9, "W", "L")) %>%
+  filter(week9 == 9) %>%
+  mutate(rank9 = rank(desc(fp_for9)))
+
+week10 <- points %>%
+  rename(week10 = week,
+         fp_for10 = fp_for,
+         fp_against10 = fp_against,
+         Opponent10 = Opponent) %>%
+  mutate(PD10 = fp_for10 - fp_against10) %>%
+  mutate(PD_percent10 = PD10 / fp_for10) %>%
+  mutate(record10 = ifelse(fp_for10 > fp_against10, "W", "L")) %>%
+  filter(week10 == 10) %>%
+  mutate(rank10 = rank(desc(fp_for10)))
+
+week11 <- points %>%
+  rename(week11 = week,
+         fp_for11 = fp_for,
+         fp_against11 = fp_against,
+         Opponent11 = Opponent) %>%
+  mutate(PD11 = fp_for11 - fp_against11) %>%
+  mutate(PD_percent11 = PD11 / fp_for11) %>%
+  mutate(record11 = ifelse(fp_for11 > fp_against11, "W", "L")) %>%
+  filter(week11 == 11) %>%
+  mutate(rank11 = rank(desc(fp_for11)))
+
+week12 <- points %>%
+  rename(week12 = week,
+         fp_for12 = fp_for,
+         fp_against12 = fp_against,
+         Opponent12 = Opponent) %>%
+  mutate(PD12 = fp_for12 - fp_against12) %>%
+  mutate(PD_percent12 = PD12 / fp_for12) %>%
+  mutate(record12 = ifelse(fp_for12 > fp_against12, "W", "L")) %>%
+  filter(week12 == 12) %>%
+  mutate(rank12 = rank(desc(fp_for12)))
+
+week13 <- points %>%
+  rename(week13 = week,
+         fp_for13 = fp_for,
+         fp_against13 = fp_against,
+         Opponent13 = Opponent) %>%
+  mutate(PD13 = fp_for13 - fp_against13) %>%
+  mutate(PD_percent13 = PD13 / fp_for13) %>%
+  mutate(record13 = ifelse(fp_for13 > fp_against13, "W", "L")) %>%
+  filter(week13 == 13) %>%
+  mutate(rank13 = rank(desc(fp_for13)))
+
+Total <- merge(week1, week2, by = c("Team","Division"))
+Total <- merge(Total, week3, by = c("Team","Division"))
+Total <- merge(Total, week4, by = c("Team","Division"))
+Total <- merge(Total, week5, by = c("Team","Division"))
+Total <- merge(Total, week6, by = c("Team","Division"))
+Total <- merge(Total, week7, by = c("Team","Division"))
+Total <- merge(Total, week8, by = c("Team","Division"))
+Total <- merge(Total, week9, by = c("Team","Division"))
+Total <- merge(Total, week10, by = c("Team","Division"))
+Total <- merge(Total, week11, by = c("Team","Division"))
+Total <- merge(Total, week12, by = c("Team","Division"))
+Total <- merge(Total, week13, by = c("Team","Division"))
+
+Total <- Total %>%
+  mutate(teams_beat_w1 = abs(10 - rank1)) %>%
+  mutate(teams_beat_w2 = abs(10 - rank2)) %>%
+  mutate(teams_beat_w3 = abs(10 - rank3)) %>%
+  mutate(teams_beat_w4 = abs(10 - rank4)) %>%
+  mutate(teams_beat_w5 = abs(10 - rank5)) %>%
+  mutate(teams_beat_w6 = abs(10 - rank6)) %>%
+  mutate(teams_beat_w7 = abs(10 - rank7)) %>%
+  mutate(teams_beat_w8 = abs(10 - rank8)) %>%
+  mutate(teams_beat_w9 = abs(10 - rank9)) %>%
+  mutate(teams_beat_w10 = abs(10 - rank10)) %>%
+  mutate(teams_beat_w11 = abs(10 - rank11)) %>%
+  mutate(teams_beat_w12 = abs(10 - rank12)) %>%
+  mutate(teams_beat_w13 = abs(10 - rank13)) 
+write_xlsx(Total, "C:/Users/jwini/OneDrive/Documents/Hockey_Stats/Fantasy Analytics/Rankings_Data.xlsx")
+
+```
+
+# How Lucky Was My Team
+
+Rank = Your weekly rank based on fantasy points for
+\newline teams_beat = how many matchups you could have won that week against all other teams
+\newline weekn = same as above, just named differently
+\newline Rank_var = low value shows you were more consistent in whatever number of teams you beat on average
+
+```{r, echo= FALSE, warning=FALSE}
+Final <- read.csv("Rankings_Data_Edited.csv")
+
+Final %>%
+  filter(record == "W") %>%
+  ggplot() +
+  geom_point(stat = "identity", aes(x = rank, y = fp_for, colour = Team, label = record)) +
+  labs(x = "Rank",
+       y = "Fantasy Points For",
+       title = "Rank and Points For, Wins Only")
+```
+
+```{r, echo= FALSE, warning=FALSE}
+Final %>%
+  group_by(Team) %>%
+  summarise(Avg_Rank = mean(rank),
+            Avg_Number_Teams_Beat = mean(teams_beat),
+            Rank_var = mean(var(rank)))
+
+Total %>%
+  group_by(Team) %>%
+  summarise(week1 = teams_beat_w1,
+            week2 = teams_beat_w2,
+            week3 = teams_beat_w3,
+            week4 = teams_beat_w4,
+            week5 = teams_beat_w5,
+            week6 = teams_beat_w6,
+            week7 = teams_beat_w7,
+            week8 = teams_beat_w8,
+            week9 = teams_beat_w9,
+            week10 = teams_beat_w10,
+            week11 = teams_beat_w11,
+            week12 = teams_beat_w12,
+            week12 = teams_beat_w13)
+
+
+Total %>%
+  group_by(Team) %>%
+  summarise("Total Wins" = sum(teams_beat_w1,
+            teams_beat_w2,
+            teams_beat_w3,
+            teams_beat_w4,
+            teams_beat_w5,
+            teams_beat_w6,
+            teams_beat_w7,
+            teams_beat_w8,
+            teams_beat_w9,
+            teams_beat_w10,
+            teams_beat_w11,
+            teams_beat_w12,
+            teams_beat_w13))
+
+
+```
+
+# Week 13 Plots
+```{r, echo=FALSE, warning= FALSE}
+points <- points %>% 
+  mutate(PD = fp_for - fp_against) %>%
+  mutate(PD_percent = PD / fp_for) %>%
+  mutate(record = ifelse(fp_for > fp_against, "W", "L")) 
+
+ggplot(data = week13) +
+  geom_point(aes(x = fp_for13, y = fp_against13, colour = Team, label = record13)) +
+  labs(x = "Fantasy Points For",
+       y = "Fantasy Points Against",
+       title = "Week 13 Points For vs. Against")
+
+ggplot(data = points) +
+  geom_point(aes(x = Team, y = PD, colour = Team)) +
+  xlab("Team") +
+  ylab("Point Differential") + 
+  geom_hline(yintercept = 0) + 
+  labs(x = "Team",
+       y = "Point Differential",
+       title = "Score Difference through Week 13") +
+  theme(axis.text.x=element_text(angle=20, margin = margin(.5, unit = "cm"),vjust = 1))
+```
+
+# Season Fantasy Points For
+```{r,echo=FALSE, warning= FALSE}
+ggplot(data = points, 
+       aes(x = week, y = fp_for, fill = Team)) +
+         geom_line(aes(color = Team)) +
+  scale_fill_brewer(palette = "Set3")
+
+```

@@ -1,0 +1,10 @@
+---
+title: "DAHL Final Stats Pack"
+author: "Jason Winik"
+date: "5/3/2021"
+output: pdf_document
+---
+
+\begin{center}
+G Lost
+\end{center}
