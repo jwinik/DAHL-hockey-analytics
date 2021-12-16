@@ -13,7 +13,7 @@ swid = "30DF2666-5ECF-459C-9F26-665ECF859C12"
 espn_s2 = 'AEAhXtbnZRQrhvOl6ptgNuOHeTnNWtlXJqvvTXfNFf0BgOjnNETLvKHqClqcorEn4%2F5fiybN1WKvlp1p2e5V7fRdvP9b551wjw%2FvlgS%2FvhZmjlHIsAzXhyyRKH%2BWIYXxmngLLec7UtqT242MwFbKjqJ%2Fm6a4lCqWa2fflj7x2WVlUt85e8muVAwNugG6rDpwBsNi%2BrcdOJks9ikbUrsSXp7wU5u7EBJBf7ZPlk57NnojcDWyr23TpOPXnqtiuDNAsBM8GuXJ7gy8neJacKOlQC5DZrQ33W0BuOWGKl%2F2V9GxCQ%3D%3D'
 
 #league is how we access the entire year's data
-league = League(league_id = 1140371907, year = 2022, espn_s2 = espn_s2, swid = swid, debug = True)
+league = League(league_id = 1140371907, year = 2022, espn_s2 = espn_s2, swid = swid)
 player_map = league.player_map
 team_list = league.teams
 
@@ -32,6 +32,86 @@ for team in league.teams:
     for player in team.roster:
         allrosteredplayers.append(player)
 
+def get_matchup_stats_to_df(period):
+    """
+
+    Parameters
+    ----------
+    period : integer
+        The input is what week you want stats for. 
+
+    Returns
+    -------
+    week_df : Dataframe
+    Returns a dataframe of matchup winners, losers, weekly rosters, and total points       
+
+    """
+    box_scores = league.box_scores(matchup_period = period)
+    matchup_list = []
+    for i in range(len(box_scores)):
+        matchup_dicts = {}
+        week = box_scores[i]
+        matchup_dicts['Away Lineup'] = week.away_lineup
+        matchup_dicts['Away Projected'] = week.away_projected       
+        matchup_dicts['Away Score'] = week.away_score
+        matchup_dicts['Away Team'] = week.away_team
+        matchup_dicts['Home Lineup'] = week.home_lineup
+        matchup_dicts['Home Projected'] = week.home_projected
+        matchup_dicts['Home Score'] = week.home_score
+        matchup_dicts['Winner'] = week.winner
+        matchup_dicts['Home Team Name'] = week.home_team.team_name
+        matchup_dicts['Away Team Name'] = week.away_team.team_name
+        matchup_dicts['Winning Team'] = matchup_dicts['Home Team Name']
+        matchup_dicts['Week Number'] = period        
+        matchup_list.append(matchup_dicts)
+        #matchup_list.loc[matchup_list['Winner'] == 'AWAY', 'Winning Team'] = matchup_list['Away Team Name'] 
+    return matchup_list
+
+'''
+Get a dataframe of the periods player points
+'''
+
+matchup_week8 = get_matchup_stats_to_df(8)
+
+m1 = matchup_week8[0]
+m1_home_lineup = m1['Home Lineup']
+name = m1['Home Team Name']
+#m1_home_lineup['Team Name'] = name
+m1_points_breakdown = []
+for p in range(len(m1_home_lineup)):
+    player = {}
+    player['Team Name'] = name
+    player['Player Name'] = m1_home_lineup[p].name
+    player['Weekly Stats'] = m1_home_lineup[p].stats#["Last 15 2022"]
+    player['Position'] = m1_home_lineup[p].position
+    player['Points'] = m1_home_lineup[p].points
+    #player = pd.DataFrame(player)
+    #player = pd.concat([player, player['Weekly Stats'].apply(pd.Series)], axis=1)
+    m1_points_breakdown.append(player)
+    df = pd.DataFrame.from_dict(m1_points_breakdown)
+
+def get_roster(matchup_week):
+    home_list = []
+    away_list = []
+    for d in range(len(matchup_week)):
+        home_dict = {}
+        home_dict['Team Name'] = d['Home Team Name']
+        home_dict['Lineup'] = d['Home Lineup']
+        
+        home_list.append(home_dict)
+        
+for w in range(0, len(league.teams[1].schedule)):
+  # Set box_score in var so you don't have to call below
+  box_score = league.box_scores(week = w)
+  for m in range(0, len(box_score)):
+    matchup = box_score[m]
+    for r in range(0, len(matchup.home_lineup)):
+      # Get all of your data here        
+
+        
+'''
+'''
+
  
 def get_player_stats(player_list):
     new_list = []
@@ -46,7 +126,12 @@ def get_player_stats(player_list):
         player_dict['Lineup Slot'] = player.lineupSlot
         player_dict['Pro Team'] = player.proTeam
         player_dict['Stats'] = player.stats
+        if 'Last 7 2022' in player_dict['Stats']:    
+            player_dict['Last 7'] = player_dict['Stats']['Last 7 2022']
+        else:
+            player_dict['Last 7'] = 0
         new_list.append(player_dict)
+    return new_list
 
 player_stats_list = get_player_stats(allrosteredplayers)
 player_stats_df = pd.DataFrame(player_stats_list)
