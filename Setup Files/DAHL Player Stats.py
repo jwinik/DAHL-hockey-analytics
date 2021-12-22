@@ -86,6 +86,9 @@ def player_stats_from_matchup(week_number, matchup_number):
     home_lineup = matchup['Home Lineup']
     home_name = matchup['Home Team Name']
     home_stats = []
+    away_lineup = matchup['Away Lineup']
+    away_name = matchup['Away Team Name']
+    away_stats = []
     for p in range(len(home_lineup)):
         player = {}
         stats = {}
@@ -99,9 +102,6 @@ def player_stats_from_matchup(week_number, matchup_number):
         #df = pd.DataFrame.from_dict(home_stats)
         home = pd.DataFrame.from_dict(home_stats)
     
-    away_lineup = matchup['Away Lineup']
-    away_name = matchup['Away Team Name']
-    away_stats = []
     for p in range(len(away_lineup)):
         player = {}
         stats = {}
@@ -125,12 +125,39 @@ def weekly_player_points(week):
     week_3 = player_stats_from_matchup(week,3)
     week_4 = player_stats_from_matchup(week,4)
     week_list = [week_0, week_1, week_2, week_3, week_4]
-    week_df = pd.concat(week_list)
+    week_df = pd.concat(week_list, sort=True).reset_index(drop=True)
+    #new_cols = ['Player Name', 'Team Name', 'Week Number', 'Position', 'Points', 
+    #        '+/-', '12', '16', '19', '25', '30', '35', '36', '37', 'A', 'ATOI', 
+    #        'BLK', 'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 
+    #        'HAT', 'HIT', 'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 'SA', 'SHA', 
+    #        'SHG', 'SHP', 'SO', 'SOG', 'SV', 'SV%', 'TTOI ?', 'W']
+    #week_df = week_df[new_cols]
     return week_df
              
 
-        
+def season_player_stats(week_start, week_end):
+    week_end = week_end + 1
+    weeks = range(week_start, week_end)
+    week_list = []
+    for w in weeks:
+        df = weekly_player_points(w)
+        week_list.append(df)
+    all_weeks = pd.concat(week_list, sort=True)
+    new_cols = ['Player Name', 'Team Name', 'Position', 'Week Number','Points',
+            '+/-', '12', '16', '19', '25', '30', '35', '36', '37', 'A', 'ATOI',
+            'BLK', 'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 
+            'HAT', 'HIT', 'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 
+            'SA', 'SHA', 'SHG', 'SHP', 'SO', 'SOG', 'SV',
+            'SV%', 'TTOI ?', 'W']
+    all_weeks = all_weeks[new_cols]
+    return all_weeks
+
+test = season_player_stats(1,9)
+
+ 
+
 '''
+Below here is useless currently
 '''
 
  
