@@ -126,35 +126,6 @@ for p in range(len(m1_home_lineup)):
 columns = df.columns
 
 
-def player_stats_matchup(week_number):
-    matchup = get_matchup_stats_to_df(week_number)
-    matchup_columns = ['Team Name', 'Player Name', 'Position', 'Points', 'G', 'A', '+/-', '16',
-       'PIM', 'PPG', '19', 'SHG', 'SHA', 'GWG', 'FOW', 'FOL', '25', 'TTOI ?',
-       'ATOI', 'SOG', '30', 'HIT', 'BLK', 'GP', '35', '36', '37', 'PPP', 'SHP',
-       'HAT', 'DEF', 'GS', 'W', 'L', 'SA', 'GA', 'SV', 'SO', 'MIN ?', 'OTL',
-       'GAA', 'SV%', '12']
-    matchup_df = pd.DataFrame(columns = matchup_columns)
-    games =[0,1,2,3]
-    for g in range(len(games)):
-        m1 = matchup[g]
-        m1_home_lineup = m1['Home Lineup']
-        m1_home_name = m1['Home Team Name']
-        home_stats = []
-        for p in range(len(m1_home_lineup)):
-            player = {}
-            stats = {}
-            player['Team Name'] = m1_home_name
-            player['Player Name'] = m1_home_lineup[p].name
-            player['Position'] = m1_home_lineup[p].position
-            player['Points'] = m1_home_lineup[p].points
-            stats = m1_home_lineup[p].stats['05null']['total']
-            merged = {**player, **stats}
-            home_stats.append(merged)
-            #df = pd.DataFrame.from_dict(home_stats)
-            output = pd.DataFrame.from_dict(home_stats)
-    return output
-                
-test = player_stats_matchup(8)
                 
 def player_stats_from_matchup(week_number, matchup_number):
     week = get_matchup_stats_to_df(week_number)
