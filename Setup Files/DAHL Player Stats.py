@@ -36,33 +36,9 @@ team_names = []
 for team in league.teams:
     name = team.team_name
     team_names.append(name)
+   
 
-#player
-stats_kane = allrosteredplayers[4].stats['Last 7 2022']
-#stats_kane['Player Name'] = allrosteredplayers[4].name
-kane_last7 = stats_kane['total']
-kane_last7['Player Name'] = allrosteredplayers[4].name
-
-
-
-
-
-stats_point = allrosteredplayers[0].stats['Last 7 2022'] #keyerror 'Last 7 2022
-point_last7 = stats_point['total']
-
-total_22 = []
-for p in range(len(allrosteredplayers)):
-    try:
-        stats = allrosteredplayers[p].stats['Last 7 2022']
-        last7 = stats['total']
-        last7['Player Name'] = allrosteredplayers[p].name
-        total_22.append(last7)
-    except KeyError:
-        print("Player did not have any games this week")
-        
-    
-
-def get_matchup_stats_to_df(period):
+def get_matchup_stats_to_dict(period):
     """
 
     Parameters
@@ -105,7 +81,7 @@ Get a dataframe of the periods player points
 #Extract last 7 2022
                 
 def player_stats_from_matchup(week_number, matchup_number):
-    week = get_matchup_stats_to_df(week_number)
+    week = get_matchup_stats_to_dict(week_number)
     matchup = week[matchup_number]
     home_lineup = matchup['Home Lineup']
     home_name = matchup['Home Team Name']
@@ -142,8 +118,15 @@ def player_stats_from_matchup(week_number, matchup_number):
     combined['Week Number'] = week_number
     return combined
     
-    
-test = player_stats_from_matchup(8,1)   
+def weekly_player_points(week):
+    week_0 = player_stats_from_matchup(week,0)
+    week_1 = player_stats_from_matchup(week,1)
+    week_2 = player_stats_from_matchup(week,2)
+    week_3 = player_stats_from_matchup(week,3)
+    week_4 = player_stats_from_matchup(week,4)
+    week_list = [week_0, week_1, week_2, week_3, week_4]
+    week_df = pd.concat(week_list)
+    return week_df
              
 
         
