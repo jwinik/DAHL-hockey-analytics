@@ -32,6 +32,36 @@ for team in league.teams:
     for player in team.roster:
         allrosteredplayers.append(player)
 
+team_names = []
+for team in league.teams:
+    name = team.team_name
+    team_names.append(name)
+
+#player
+stats_kane = allrosteredplayers[4].stats['Last 7 2022']
+#stats_kane['Player Name'] = allrosteredplayers[4].name
+kane_last7 = stats_kane['total']
+kane_last7['Player Name'] = allrosteredplayers[4].name
+
+
+
+
+
+stats_point = allrosteredplayers[0].stats['Last 7 2022'] #keyerror 'Last 7 2022
+point_last7 = stats_point['total']
+
+total_22 = []
+for p in range(len(allrosteredplayers)):
+    try:
+        stats = allrosteredplayers[p].stats['Last 7 2022']
+        last7 = stats['total']
+        last7['Player Name'] = allrosteredplayers[p].name
+        total_22.append(last7)
+    except KeyError:
+        print("Player did not have any games this week")
+        
+    
+
 def get_matchup_stats_to_df(period):
     """
 
@@ -67,46 +97,106 @@ def get_matchup_stats_to_df(period):
         #matchup_list.loc[matchup_list['Winner'] == 'AWAY', 'Winning Team'] = matchup_list['Away Team Name'] 
     return matchup_list
 
+
+
 '''
 Get a dataframe of the periods player points
 '''
-
+#Extract last 7 2022
 matchup_week8 = get_matchup_stats_to_df(8)
 
 m1 = matchup_week8[0]
 m1_home_lineup = m1['Home Lineup']
 name = m1['Home Team Name']
-#m1_home_lineup['Team Name'] = name
-m1_points_breakdown = []
+stats_list = []
 for p in range(len(m1_home_lineup)):
     player = {}
+    stats = {}
     player['Team Name'] = name
     player['Player Name'] = m1_home_lineup[p].name
-    player['Weekly Stats'] = m1_home_lineup[p].stats#["Last 15 2022"]
     player['Position'] = m1_home_lineup[p].position
     player['Points'] = m1_home_lineup[p].points
+    stats = m1_home_lineup[p].stats['05null']['total']
+    merged = {**player, **stats}
     #player = pd.DataFrame(player)
     #player = pd.concat([player, player['Weekly Stats'].apply(pd.Series)], axis=1)
-    m1_points_breakdown.append(player)
-    df = pd.DataFrame.from_dict(m1_points_breakdown)
+    stats_list.append(merged)
+    
+    df = pd.DataFrame.from_dict(stats_list)
+columns = df.columns
 
-def get_roster(matchup_week):
-    home_list = []
-    away_list = []
-    for d in range(len(matchup_week)):
-        home_dict = {}
-        home_dict['Team Name'] = d['Home Team Name']
-        home_dict['Lineup'] = d['Home Lineup']
-        
-        home_list.append(home_dict)
-        
-for w in range(0, len(league.teams[1].schedule)):
-  # Set box_score in var so you don't have to call below
-  box_score = league.box_scores(week = w)
-  for m in range(0, len(box_score)):
-    matchup = box_score[m]
-    for r in range(0, len(matchup.home_lineup)):
-      # Get all of your data here        
+
+def player_stats_matchup(week_number):
+    matchup = get_matchup_stats_to_df(week_number)
+    matchup_columns = ['Team Name', 'Player Name', 'Position', 'Points', 'G', 'A', '+/-', '16',
+       'PIM', 'PPG', '19', 'SHG', 'SHA', 'GWG', 'FOW', 'FOL', '25', 'TTOI ?',
+       'ATOI', 'SOG', '30', 'HIT', 'BLK', 'GP', '35', '36', '37', 'PPP', 'SHP',
+       'HAT', 'DEF', 'GS', 'W', 'L', 'SA', 'GA', 'SV', 'SO', 'MIN ?', 'OTL',
+       'GAA', 'SV%', '12']
+    matchup_df = pd.DataFrame(columns = matchup_columns)
+    games =[0,1,2,3]
+    for g in range(len(games)):
+        m1 = matchup[g]
+        m1_home_lineup = m1['Home Lineup']
+        m1_home_name = m1['Home Team Name']
+        home_stats = []
+        for p in range(len(m1_home_lineup)):
+            player = {}
+            stats = {}
+            player['Team Name'] = m1_home_name
+            player['Player Name'] = m1_home_lineup[p].name
+            player['Position'] = m1_home_lineup[p].position
+            player['Points'] = m1_home_lineup[p].points
+            stats = m1_home_lineup[p].stats['05null']['total']
+            merged = {**player, **stats}
+            home_stats.append(merged)
+            #df = pd.DataFrame.from_dict(home_stats)
+            output = pd.DataFrame.from_dict(home_stats)
+    return output
+                
+test = player_stats_matchup(8)
+                
+def player_stats_from_matchup(week_number, matchup_number):
+    week = get_matchup_stats_to_df(week_number)
+    matchup = week[matchup_number]
+    home_lineup = matchup['Home Lineup']
+    home_name = matchup['Home Team Name']
+    home_stats = []
+    for p in range(len(home_lineup)):
+        player = {}
+        stats = {}
+        player['Team Name'] = home_name
+        player['Player Name'] = home_lineup[p].name
+        player['Position'] = home_lineup[p].position
+        player['Points'] = home_lineup[p].points
+        stats = home_lineup[p].stats['05null']['total']
+        merged = {**player, **stats}
+        home_stats.append(merged)
+        #df = pd.DataFrame.from_dict(home_stats)
+        home = pd.DataFrame.from_dict(home_stats)
+    
+    away_lineup = matchup['Away Lineup']
+    away_name = matchup['Away Team Name']
+    away_stats = []
+    for p in range(len(away_lineup)):
+        player = {}
+        stats = {}
+        player['Team Name'] = away_name
+        player['Player Name'] = away_lineup[p].name
+        player['Position'] = away_lineup[p].position
+        player['Points'] = away_lineup[p].points
+        stats = away_lineup[p].stats['05null']['total']
+        merged = {**player, **stats}
+        away_stats.append(merged)
+        away = pd.DataFrame.from_dict(away_stats)
+    both = [home,away]
+    combined = pd.concat(both, sort=True)
+    combined['Week Number'] = week_number
+    return combined
+    
+    
+test = player_stats_from_matchup(8,1)   
+             
 
         
 '''
