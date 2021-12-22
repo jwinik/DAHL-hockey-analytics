@@ -103,29 +103,6 @@ def get_matchup_stats_to_df(period):
 Get a dataframe of the periods player points
 '''
 #Extract last 7 2022
-matchup_week8 = get_matchup_stats_to_df(8)
-
-m1 = matchup_week8[0]
-m1_home_lineup = m1['Home Lineup']
-name = m1['Home Team Name']
-stats_list = []
-for p in range(len(m1_home_lineup)):
-    player = {}
-    stats = {}
-    player['Team Name'] = name
-    player['Player Name'] = m1_home_lineup[p].name
-    player['Position'] = m1_home_lineup[p].position
-    player['Points'] = m1_home_lineup[p].points
-    stats = m1_home_lineup[p].stats['05null']['total']
-    merged = {**player, **stats}
-    #player = pd.DataFrame(player)
-    #player = pd.concat([player, player['Weekly Stats'].apply(pd.Series)], axis=1)
-    stats_list.append(merged)
-    
-    df = pd.DataFrame.from_dict(stats_list)
-columns = df.columns
-
-
                 
 def player_stats_from_matchup(week_number, matchup_number):
     week = get_matchup_stats_to_df(week_number)
