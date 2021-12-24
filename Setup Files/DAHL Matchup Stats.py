@@ -4,20 +4,17 @@ Created on Sun Nov 21 13:31:01 2021
 
 @author: jwini
 """
-from espn_api.hockey import League
+
 cred_path = "C:/Users/jwini/OneDrive/Documents/Python Scripts/hockey-analytics/Setup Files/credentials.py"
 exec(open(cred_path).read())
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
-from IPython.display import display
-import pandas as pd
 
 #swid = "30DF2666-5ECF-459C-9F26-665ECF859C12"
 #espn_s2 = 'AEAhXtbnZRQrhvOl6ptgNuOHeTnNWtlXJqvvTXfNFf0BgOjnNETLvKHqClqcorEn4%2F5fiybN1WKvlp1p2e5V7fRdvP9b551wjw%2FvlgS%2FvhZmjlHIsAzXhyyRKH%2BWIYXxmngLLec7UtqT242MwFbKjqJ%2Fm6a4lCqWa2fflj7x2WVlUt85e8muVAwNugG6rDpwBsNi%2BrcdOJks9ikbUrsSXp7wU5u7EBJBf7ZPlk57NnojcDWyr23TpOPXnqtiuDNAsBM8GuXJ7gy8neJacKOlQC5DZrQ33W0BuOWGKl%2F2V9GxCQ%3D%3D'
 
-#league is how we access the entire year's data
-league = League(league_id = 1140371907, year = 2022, espn_s2 = espn_s2, swid = swid)
+league = League(league_id = league_id, year = 2022, espn_s2 = espn_s2, swid = swid)
 
 def get_matchup_stats_to_df(period):
     """
@@ -117,7 +114,7 @@ def clean_matchup_dfs(matchup_weeks):
 def plot_weekly_points(matchup_df, week):
     week_range = week + 1
     range_list = list(range(1,week_range))
-    fig, ax = plt.subplots(figsize = (14,14))
+    fig, ax = plt.subplots(figsize = (9,8))
     #df = df[df['Fantasy Points'] == aid_type]
     week_number = len(matchup_df)/10
     for key, grp in matchup_df.groupby(['Team Name']):
@@ -139,7 +136,7 @@ def plot_week_bar(matchup_df, week):
                          id_vars=["Week Number", "Team Name", "Home or Away", "Winner"],
                          value_vars= ['Fantasy Points', "Opponent Fantasy Points"],
                          var_name="Points Type", value_name="Fantasy Points")
-    fig_dims = (14,10)
+    fig_dims = (9,8)
     fig, ax = plt.subplots(figsize = fig_dims)
     sns.barplot(x="Team Name", y="Fantasy Points", hue='Points Type',
                 data=matchup_df[matchup_df['Week Number']==week],
@@ -150,13 +147,6 @@ def plot_week_bar(matchup_df, week):
     plt.legend(title="", loc='best', fontsize=20)
    
 
-#points for vs against
-#week1_bar = plot_week_bar(matchup_df_clean, 1)
-#week2_bar = plot_week_bar(matchup_df_clean, 2)
-#week3_bar = plot_week_bar(matchup_df_clean, 3)
-#week4_bar = plot_week_bar(matchup_df_clean, 4)
-#week5_bar = plot_week_bar(matchup_df_clean, 5)
-
 
 # weekly ranking table with average rank
 
@@ -166,6 +156,7 @@ def matchup_tables(matchup_df, values, boolean=False):
     matchup_df['Total'] = matchup_df.sum(axis=1) - matchup_df['Average']
     matchup_df = matchup_df.sort_values('Total', ascending=boolean)  
     #matchup_df['Average'] = matchup_df['Average'].style.set_precision(5)
+    matchup_df.loc['mean'] = matchup_df.mean()
     return matchup_df
     
 #week_points_for = matchup_tables(matchup_df_clean, "Fantasy Points")   

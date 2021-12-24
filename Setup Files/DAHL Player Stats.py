@@ -9,11 +9,11 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 
-swid = "30DF2666-5ECF-459C-9F26-665ECF859C12"
-espn_s2 = 'AEAhXtbnZRQrhvOl6ptgNuOHeTnNWtlXJqvvTXfNFf0BgOjnNETLvKHqClqcorEn4%2F5fiybN1WKvlp1p2e5V7fRdvP9b551wjw%2FvlgS%2FvhZmjlHIsAzXhyyRKH%2BWIYXxmngLLec7UtqT242MwFbKjqJ%2Fm6a4lCqWa2fflj7x2WVlUt85e8muVAwNugG6rDpwBsNi%2BrcdOJks9ikbUrsSXp7wU5u7EBJBf7ZPlk57NnojcDWyr23TpOPXnqtiuDNAsBM8GuXJ7gy8neJacKOlQC5DZrQ33W0BuOWGKl%2F2V9GxCQ%3D%3D'
+#swid = "30DF2666-5ECF-459C-9F26-665ECF859C12"
+#espn_s2 = 'AEAhXtbnZRQrhvOl6ptgNuOHeTnNWtlXJqvvTXfNFf0BgOjnNETLvKHqClqcorEn4%2F5fiybN1WKvlp1p2e5V7fRdvP9b551wjw%2FvlgS%2FvhZmjlHIsAzXhyyRKH%2BWIYXxmngLLec7UtqT242MwFbKjqJ%2Fm6a4lCqWa2fflj7x2WVlUt85e8muVAwNugG6rDpwBsNi%2BrcdOJks9ikbUrsSXp7wU5u7EBJBf7ZPlk57NnojcDWyr23TpOPXnqtiuDNAsBM8GuXJ7gy8neJacKOlQC5DZrQ33W0BuOWGKl%2F2V9GxCQ%3D%3D'
 
 #league is how we access the entire year's data
-league = League(league_id = 1140371907, year = 2022, espn_s2 = espn_s2, swid = swid)
+#league = League(league_id = 1140371907, year = 2022, espn_s2 = espn_s2, swid = swid)
 player_map = league.player_map
 team_list = league.teams
 
@@ -69,8 +69,7 @@ def get_matchup_stats_to_dict(period):
         matchup_dicts['Away Team Name'] = week.away_team.team_name
         matchup_dicts['Winning Team'] = matchup_dicts['Home Team Name']
         matchup_dicts['Week Number'] = period        
-        matchup_list.append(matchup_dicts)
-        #matchup_list.loc[matchup_list['Winner'] == 'AWAY', 'Winning Team'] = matchup_list['Away Team Name'] 
+        matchup_list.append(matchup_dicts) 
     return matchup_list
 
 
@@ -126,12 +125,6 @@ def weekly_player_points(week):
     week_4 = player_stats_from_matchup(week,4)
     week_list = [week_0, week_1, week_2, week_3, week_4]
     week_df = pd.concat(week_list, sort=True).reset_index(drop=True)
-    #new_cols = ['Player Name', 'Team Name', 'Week Number', 'Position', 'Points', 
-    #        '+/-', '12', '16', '19', '25', '30', '35', '36', '37', 'A', 'ATOI', 
-    #        'BLK', 'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 
-    #        'HAT', 'HIT', 'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 'SA', 'SHA', 
-    #        'SHG', 'SHP', 'SO', 'SOG', 'SV', 'SV%', 'TTOI ?', 'W']
-    #week_df = week_df[new_cols]
     return week_df
              
 
@@ -152,7 +145,7 @@ def season_player_stats(week_start, week_end):
     all_weeks = all_weeks[new_cols]
     return all_weeks
 
-test = season_player_stats(1,9)
+#test = season_player_stats(1,9)
 
  
 
@@ -181,8 +174,8 @@ def get_player_stats(player_list):
         new_list.append(player_dict)
     return new_list
 
-player_stats_list = get_player_stats(allrosteredplayers)
-player_stats_df = pd.DataFrame(player_stats_list)
+#player_stats_list = get_player_stats(allrosteredplayers)
+#player_stats_df = pd.DataFrame(player_stats_list)
 
 
 def get_team_info(team_list):
@@ -200,9 +193,9 @@ def get_team_info(team_list):
         blank_list.append(team_dict)
     return blank_list
 
-all_team_info = get_team_info(team_list)
+#all_team_info = get_team_info(team_list)
 
-team_df = pd.DataFrame(all_team_info)
+#team_df = pd.DataFrame(all_team_info)
 
 
 #def get_team_players(all_team_info):
@@ -237,7 +230,7 @@ def unpack_stats(df, owner_name):
     unpacked_all = [last15_2022, last7_2022, total_2021, total_2022, last30_2022, proj_2021, proj_2022]
     return unpacked_all
 
-tony_stats = unpack_stats(team_df, 'Jason Winik')
+#tony_stats = unpack_stats(team_df, 'Jason Winik')
 
 
 #
