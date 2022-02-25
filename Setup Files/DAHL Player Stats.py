@@ -146,8 +146,89 @@ def season_player_stats(week_start, week_end):
     return all_weeks
 
 #test = season_player_stats(1,9)
+#team_names
+#week_range = list(range(0,10+1))
 
- 
+x_stats = ['Points', '+/-',
+       '12', '16', '19', '25', '30', '35', '36', '37', 'A', 'ATOI', 'BLK',
+       'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 'HAT', 'HIT',
+       'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 'SA', 'SHA', 'SHG', 'SHP',
+       'SO', 'SOG', 'SV', 'SV%', 'TTOI ?', 'W']
+y_stats = ['Points', '+/-',
+       '12', '16', '19', '25', '30', '35', '36', '37', 'A', 'ATOI', 'BLK',
+       'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 'HAT', 'HIT',
+       'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 'SA', 'SHA', 'SHG', 'SHP',
+       'SO', 'SOG', 'SV', 'SV%', 'TTOI ?', 'W']
+
+def plot_player_scatter(week_start, week_end, data, x_stat, y_stat):
+    fig, ax = plt.subplots(figsize = (9,8))
+    #data = data.loc[team]
+    for team, group in data.groupby('Team Name'):
+        ax.scatter(group[x_stat], group[y_stat], label = team)
+    ax.legend(loc='best')
+    ax.set_ylabel(str(y_stat) + ' per Player')
+    ax.set_xlabel(str(x_stat) + ' per Player')
+    ax.set_title(str(x_stat) + ' and ' + str(y_stat) + ' per Player: Week ' + str(week_start) + " to " + str(week_end))
+    
+    
+def plot_player_lines(df, team, x_stat, y_stat, week = 0):
+    if week == 0:
+        fig, ax = plt.subplots(figsize = (10,10))
+        df = df[df['Team Name'] == team]
+        for key, grp in df.groupby(['Player Name']):
+                ax.scatter(grp[x_stat], grp[y_stat], label=key)
+                plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        ax.set_ylabel(str(y_stat) + ' per Player')
+        ax.set_xlabel(str(x_stat) + ' per Player')
+        ax.set_title(str(x_stat) + ' and ' + str(y_stat) + ' per Player: Season, ' + team)
+    else:
+        fig, ax = plt.subplots(figsize = (10,10))
+        df = df[df['Team Name'] == team]
+        df = df[df['Week Number'] == week]
+        for key, grp in df.groupby(['Player Name']):
+                ax.scatter(grp[x_stat], grp[y_stat], label=key)
+                plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        ax.set_ylabel(str(y_stat) + ' per Player')
+        ax.set_xlabel(str(x_stat) + ' per Player')
+        ax.set_title(str(x_stat) + ' and ' + str(y_stat) + ' per Player: Week ' + str(week) + ": " + team)
+        ax.get_legend().remove()
+        df[[x_stat,y_stat,'Player Name']].apply(lambda x: ax.text(*x),axis=1)
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
 Below here is useless currently
