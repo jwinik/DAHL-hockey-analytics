@@ -126,6 +126,19 @@ def plot_weekly_points(matchup_df, week):
             plt.xlim(1,week)
             plt.setp(ax, xticks=range_list)
 
+def create_matchup_df(start, end):
+    matchup_list = []
+    matchup_list_clean = []
+    for i in range(start, end+1):
+        matchup_weeki = get_matchup_stats_to_df(i)
+        matchup_list.append(matchup_weeki)
+    for j in matchup_list:
+        clean_weeki = clean_matchup_df(j)
+        matchup_list_clean.append(clean_weeki)
+    matchup_df = pd.concat(matchup_list_clean)
+    return matchup_df
+    
+
 #points over time
 #plot_weekly_points(matchup_df_clean,6)
 
