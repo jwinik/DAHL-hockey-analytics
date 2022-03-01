@@ -2,39 +2,41 @@
 import path
 import os
 from espn_api.hockey import League
-from ipywidgets import interact, interact_manual
+import pandas as pd
+import numpy as np
 
 ##################
-setup_path = "C:/Users/jwini/OneDrive/Documents/Python Scripts/hockey-analytics/Setup Files/"
-cred_fname = "credentials.py"
+setup_path = r"C:/Users/jwini/OneDrive/Documents/Python Scripts/hockey-analytics/Setup Files/"
+output_path = r"C:/Users/jwini/OneDrive/Documents/Python Scripts/hockey-analytics/Outputs"
+
+cred_fname = r"credentials.py"
 matchup_fname = "DAHL Matchup Stats.py"
 player_fname = "DAHL Player Stats.py"
 
+matchup_csv = "/matchup_stats.csv"
+player_csv = "/player_stats.csv"
+
+matchup_path = os.path.join(output_path + matchup_csv)
+player_path = os.path.join(output_path + player_csv)
+
+
+#Run setup_files
 setup_files = [cred_fname, matchup_fname, player_fname]
-    
 for f in setup_files:
     exec(open(os.path.join(setup_path, f)).read())
     
 
 
 #####################
-week = 18
+week = 20
 
 matchup_stats = create_matchup_df(1,week) 
 player_stats = season_player_stats(1,week)
 
+matchup_stats = matchup_player_stats(matchup_stats, player_stats)
 
 
-# Matchup Tables
-matchup_tables(matchup_stats, "Fantasy Points", False)
-
-matchup_tables(matchup_stats, "Opponent Fantasy Points", False)   
-
-matchup_tables(matchup_stats, "Fantasy Points Rank", True) 
-
-
-
-player_stats = season_player_stats(1,week)
-
-
+###### Export to csv
+matchup_stats.to_csv(matchup_path)
+player_stats.to_csv(player_path)
  

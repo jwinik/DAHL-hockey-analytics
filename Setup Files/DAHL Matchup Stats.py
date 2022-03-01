@@ -16,7 +16,7 @@ from matplotlib import pyplot as plt
 
 league = League(league_id = league_id, year = 2022, espn_s2 = espn_s2, swid = swid)
 
-def get_matchup_stats_to_df(period):
+def get_matchup_list(period):
     """
 
     Parameters
@@ -27,7 +27,7 @@ def get_matchup_stats_to_df(period):
     Returns
     -------
     week_df : Dataframe
-    Returns a dataframe of matchup winners, losers, weekly rosters, and total points       
+    Returns a list of 5 matchup level stats
 
     """
     box_scores = league.box_scores(matchup_period = period)
@@ -52,15 +52,21 @@ def get_matchup_stats_to_df(period):
     return matchup_list
 
 
-#matchup_week1 = get_matchup_stats_to_df(1)
-#matchup_week2 = get_matchup_stats_to_df(2)
-#matchup_week3 = get_matchup_stats_to_df(3)
-#matchup_week4 = get_matchup_stats_to_df(4)
-#matchup_week5 = get_matchup_stats_to_df(5)
-#matchup_week6 = get_matchup_stats_to_df(6)
+def matchup_list_to_df(matchup_list):
+    """
 
+    Parameters
+    ----------
+    matchup_list : 
+        The input is the list of matchup dictionaries.
 
-def clean_matchup_df(matchup_list):
+    Returns
+    -------
+    matchup_df : Dataframe
+    Returns a dataframe with summary stats for each matchup
+
+    """
+
     home_list = []
     away_list = []
     for i in range(len(matchup_list)):
@@ -97,19 +103,30 @@ def clean_matchup_df(matchup_list):
         matchup_df['Fantasy Points Rank'] = matchup_df['Fantasy Points'].rank(ascending=False)
     return matchup_df
     
-#week1 = clean_matchup_df(matchup_week1)
-#week2 = clean_matchup_df(matchup_week2)
-#week3 = clean_matchup_df(matchup_week3)        
-#week4 = clean_matchup_df(matchup_week4)        
-#week5 = clean_matchup_df(matchup_week5)
-#matchup_weeks = [week1, week2, week3, week4, week5]
-
-
-def clean_matchup_dfs(matchup_weeks):
-    matchup_df = pd.concat(matchup_weeks).reset_index(drop=True)
+def create_matchup_df(start, end):
+    matchup_list = []
+    matchup_list_clean = []
+    for i in range(start, end+1):
+        matchup_weeki = get_matchup_list(i)
+        matchup_list.append(matchup_weeki)
+    for j in matchup_list:
+        clean_weeki = matchup_list_to_df(j)
+        matchup_list_clean.append(clean_weeki)
+    matchup_df = pd.concat(matchup_list_clean)
     return matchup_df
 
-#matchup_df_clean = clean_matchup_dfs(matchup_weeks)
+
+
+
+
+
+
+
+
+
+
+
+################## Matchup Plots #################
 
 def plot_weekly_points(matchup_df, week):
     week_range = week + 1
@@ -126,23 +143,10 @@ def plot_weekly_points(matchup_df, week):
             plt.xlim(1,week)
             plt.setp(ax, xticks=range_list)
 
-def create_matchup_df(start, end):
-    matchup_list = []
-    matchup_list_clean = []
-    for i in range(start, end+1):
-        matchup_weeki = get_matchup_stats_to_df(i)
-        matchup_list.append(matchup_weeki)
-    for j in matchup_list:
-        clean_weeki = clean_matchup_df(j)
-        matchup_list_clean.append(clean_weeki)
-    matchup_df = pd.concat(matchup_list_clean)
-    return matchup_df
+
     
 
 #points over time
-#plot_weekly_points(matchup_df_clean,6)
-
-
 
 def plot_week_bar(matchup_df, week):
     matchup_df = pd.melt(matchup_df,
@@ -172,7 +176,5 @@ def matchup_tables(matchup_df, values, boolean=False):
     matchup_df.loc['mean'] = matchup_df.mean()
     return matchup_df
     
-#week_points_for = matchup_tables(matchup_df_clean, "Fantasy Points")   
-#week_points_against = matchup_tables(matchup_df_clean, "Opponent Fantasy Points")   
-#week_rankings = matchup_tables(matchup_df_clean, "Fantasy Points Rank")   
+
 

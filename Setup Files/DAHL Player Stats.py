@@ -9,22 +9,10 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 
-#swid = "30DF2666-5ECF-459C-9F26-665ECF859C12"
-#espn_s2 = 'AEAhXtbnZRQrhvOl6ptgNuOHeTnNWtlXJqvvTXfNFf0BgOjnNETLvKHqClqcorEn4%2F5fiybN1WKvlp1p2e5V7fRdvP9b551wjw%2FvlgS%2FvhZmjlHIsAzXhyyRKH%2BWIYXxmngLLec7UtqT242MwFbKjqJ%2Fm6a4lCqWa2fflj7x2WVlUt85e8muVAwNugG6rDpwBsNi%2BrcdOJks9ikbUrsSXp7wU5u7EBJBf7ZPlk57NnojcDWyr23TpOPXnqtiuDNAsBM8GuXJ7gy8neJacKOlQC5DZrQ33W0BuOWGKl%2F2V9GxCQ%3D%3D'
 
-#league is how we access the entire year's data
-#league = League(league_id = 1140371907, year = 2022, espn_s2 = espn_s2, swid = swid)
 player_map = league.player_map
 team_list = league.teams
 
-# player of the week
-# team of the week
-# matchup table
-# matchup graph
-# Team with the most forward points
-# Team with the most d points
-# team with the most goalie points
-# Rolling graph of each week's team points, and thick line for average points
 
 # Get a list of all the rostered players
 allrosteredplayers = []
@@ -40,7 +28,6 @@ for team in league.teams:
 
 def get_matchup_stats_to_dict(period):
     """
-
     Parameters
     ----------
     period : integer
@@ -49,7 +36,7 @@ def get_matchup_stats_to_dict(period):
     Returns
     -------
     week_df : Dataframe
-    Returns a dataframe of matchup winners, losers, weekly rosters, and total points       
+    Returns a dataframe with stats for each matchup.      
 
     """
     box_scores = league.box_scores(matchup_period = period)
@@ -78,8 +65,8 @@ def get_matchup_stats_to_dict(period):
 Get a dataframe of the periods player points
 '''
 #Extract last 7 2022
-                
-def player_stats_from_matchup(week_number, matchup_number):
+#Breaks the matchup from # of matchup into number of teams            
+def player_stats_by_matchup(week_number, matchup_number):
     week = get_matchup_stats_to_dict(week_number)
     matchup = week[matchup_number]
     home_lineup = matchup['Home Lineup']
@@ -116,17 +103,20 @@ def player_stats_from_matchup(week_number, matchup_number):
     combined = pd.concat(both, sort=True)
     combined['Week Number'] = week_number
     return combined
-    
+
+#combines all 5 matchup dfs into one list    
 def weekly_player_points(week):
-    week_0 = player_stats_from_matchup(week,0)
-    week_1 = player_stats_from_matchup(week,1)
-    week_2 = player_stats_from_matchup(week,2)
-    week_3 = player_stats_from_matchup(week,3)
-    week_4 = player_stats_from_matchup(week,4)
+    week_0 = player_stats_by_matchup(week,0)
+    week_1 = player_stats_by_matchup(week,1)
+    week_2 = player_stats_by_matchup(week,2)
+    week_3 = player_stats_by_matchup(week,3)
+    week_4 = player_stats_by_matchup(week,4)
     week_list = [week_0, week_1, week_2, week_3, week_4]
     week_df = pd.concat(week_list, sort=True).reset_index(drop=True)
     return week_df
              
+#main function to get final dataframe
+
 
 def season_player_stats(week_start, week_end):
     week_end = week_end + 1
@@ -142,20 +132,38 @@ def season_player_stats(week_start, week_end):
             'HAT', 'HIT', 'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 
             'SA', 'SHA', 'SHG', 'SHP', 'SO', 'SOG', 'SV',
             'SV%', 'TTOI ?', 'W']
-    all_weeks = all_weeks[new_cols]
-    return all_weeks
+    df = all_weeks[new_cols]
+    
+    df["W"] = df.W.fillna(999)
+    df.loc[df.W != 999, "Position"] = "Goalie"
+    df.loc[df.W == 999, "W"] = None
 
-#test = season_player_stats(1,9)
-#team_names
-#week_range = list(range(0,10+1))
+    keep_cols = ['Player Name', 'Team Name', 'Position', 'Week Number','Points',
+        '+/-', 'A', 'ATOI',
+        'BLK', 'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 
+        'HAT', 'HIT', 'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 
+        'SA', 'SHA', 'SHG', 'SHP', 'SO', 'SOG', 'SV',
+        'SV%', 'TTOI ?', 'W']
+
+    df = df.drop(columns =[col for col in df if col not in keep_cols])
+    df = df[keep_cols]
+    return df
+
+def matchup_player_stats(matchup_stats, player_stats):
+    player_stats = player_stats.groupby(by=["Team Name", "Week Number"]).sum()
+    merged = matchup_stats.merge(player_stats, on=["Team Name", "Week Number"])
+    merged['Fantasy Points Rank, Whole Season'] = merged['Fantasy Points'].rank(ascending=False)
+    return merged
+
+######################## Plots ########################
 
 x_stats = ['Points', '+/-',
-       '12', '16', '19', '25', '30', '35', '36', '37', 'A', 'ATOI', 'BLK',
+       'A', 'ATOI', 'BLK',
        'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 'HAT', 'HIT',
        'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 'SA', 'SHA', 'SHG', 'SHP',
        'SO', 'SOG', 'SV', 'SV%', 'TTOI ?', 'W']
 y_stats = ['Points', '+/-',
-       '12', '16', '19', '25', '30', '35', '36', '37', 'A', 'ATOI', 'BLK',
+       'A', 'ATOI', 'BLK',
        'DEF', 'FOL', 'FOW', 'G', 'GA', 'GAA', 'GP', 'GS', 'GWG', 'HAT', 'HIT',
        'L', 'MIN ?', 'OTL', 'PIM', 'PPG', 'PPP', 'SA', 'SHA', 'SHG', 'SHP',
        'SO', 'SOG', 'SV', 'SV%', 'TTOI ?', 'W']
