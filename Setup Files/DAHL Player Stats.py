@@ -4,10 +4,9 @@ Created on Sat Jul 17 12:10:15 2021
 
 @author: jwini
 """
-from espn_api.hockey import League
 import pandas as pd
-import seaborn as sns
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 player_map = league.player_map
@@ -147,13 +146,27 @@ def season_player_stats(week_start, week_end):
 
     df = df.drop(columns =[col for col in df if col not in keep_cols])
     df = df[keep_cols]
+    
+    df['FPPG'] = np.where(df['Position'] != 'Goalie', 
+                                       df['Points'] / df['GP'],
+                                       df['Points'] / df['GS'])
+    df['Over 3 FPPG'] = np.where(df['FPPG'] >= 3.0, True, False)
+    df['Over 4 FPPG'] = np.where(df['FPPG'] >= 4.0, True, False)
+   
     return df
 
 def matchup_player_stats(matchup_stats, player_stats):
-    player_stats = player_stats.groupby(by=["Team Name", "Week Number"]).sum()
+    player_stats = player_stats.groupby(by=["Team Name", "Week Number"]).sum().reset_index()
+    player_stats = player_stats.replace([np.inf, -np.inf], np.nan)
     merged = matchup_stats.merge(player_stats, on=["Team Name", "Week Number"])
     merged['Fantasy Points Rank, Whole Season'] = merged['Fantasy Points'].rank(ascending=False)
     return merged
+
+
+
+
+
+
 
 ######################## Plots ########################
 
@@ -321,5 +334,3 @@ def unpack_stats(df, owner_name):
 
 #tony_stats = unpack_stats(team_df, 'Jason Winik')
 
-
-#
