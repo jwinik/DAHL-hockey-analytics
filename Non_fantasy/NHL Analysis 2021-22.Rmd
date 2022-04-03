@@ -1,0 +1,63 @@
+---
+title: "EW_Hockey_Stats"
+author: "Jason Winik"
+date: "3/29/2022"
+output: pdf_document
+---
+
+```{r }
+library(tidyverse)
+
+setwd("C:/Python Scripts/hockey-analytics/Non_fantasy")
+
+data <- read.csv("EH_std_sk_stats_all_regular_no_adj_2022-03-30.csv")
+
+```
+
+## PLayer Points by Age
+
+
+```{r}
+data$Age <- as.factor(data$Age)
+
+data <- data %>%
+  mutate("PPG" = Points / GP)
+
+ages <- data %>%
+  group_by(Age) %>%
+  summarise("Count" = n(),
+            "GP" = sum(GP),
+            "PPG" = sum(PPG),
+            "Points" = sum(Points),
+            "G" = sum(G),
+            "A1" = sum(A1),
+            "A2" = sum(A2),
+            "Normalized_Points" = sum(Points) / sum(n()))
+
+
+ggplot(data = ages, aes(x=Age, y=PPG)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Points per Game by Age, 2021-2022",
+       caption = "Data as of 3/29/2022")
+
+ggplot(data = ages, aes(x=Age, y=Points)) +
+  geom_bar(stat = "identity", fill = "darkred")+
+  labs(x = "Age",
+       y = "Points",
+       title = "Total Points for each Age Group",
+       subtitle = "2021-22 Season to Date",
+       caption = "The white labels are the number of players in that age group. Data as of 3/30/22") +
+  geom_text(aes(label = Count), vjust = 1.5, colour = "white")
+
+
+ggplot(data = ages, aes(x=reorder(Age, Normalized_Points), y=Normalized_Points)) +
+  geom_bar(stat = "identity", fill="darkblue") +
+  labs(x = "Age",
+       y = "Avg Points/ Skater",
+       title = "Avg. Points per Skater of each Age",
+       subtitle = "2021-22 Season to Date",
+       caption = "The white labels are the number of players in that age group. Data as of 3/30/22") +
+  geom_text(aes(label = Count), vjust = 1.5, colour = "white")
+
+
+```
