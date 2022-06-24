@@ -155,6 +155,7 @@ def season_player_stats(week_start, week_end):
    
     return df
 
+
 def matchup_player_stats(matchup_stats, player_stats):
     player_stats = player_stats.groupby(by=["Team Name", "Week Number"]).sum().reset_index()
     player_stats = player_stats.replace([np.inf, -np.inf], np.nan)
@@ -162,11 +163,19 @@ def matchup_player_stats(matchup_stats, player_stats):
     merged['Fantasy Points Rank, Whole Season'] = merged['Fantasy Points'].rank(ascending=False)
     return merged
 
+#Merges the player stats df with a Evolving Hockey df with player ages
 
 
 
-
-
+def merge_pstats(player_stats, info_csv, info_csv_path):
+    player_info = pd.read_csv(os.path.join(info_csv_path, info_csv))
+    merge_cols = ['Player', 'Shoots', 'Birthday', 'Age', 'Draft Yr', 'Draft Rd', 'Draft Ov']
+    player_info = player_info[[col for col in player_info.columns if col in merge_cols]]
+    df = pd.merge(player_stats, player_info,
+                  how = "left",
+                  left_on = "Player Name", 
+                  right_on = "Player")
+    return df
 
 ######################## Plots ########################
 
@@ -215,7 +224,26 @@ def plot_player_lines(df, team, x_stat, y_stat, week = 0):
         ax.get_legend().remove()
         df[[x_stat,y_stat,'Player Name']].apply(lambda x: ax.text(*x),axis=1)
         
-
+#plots age points bar chart
+def plot_age_bar(data, week = 0, team = 0):
+    data = data.groupby(['Team Name', "Week Number", 'Age']).sum().reset_index()
+    if week == 0:
+        data = data.groupby(['Team Name', 'Age']).sum().reset_index()
+        label = "2021-22 Season"
+    else:
+        data = data[data['Week Number'] == week]
+        label = "Week " + str(week)
+    if team == 0:
+       data = data.groupby(['Age']).sum().reset_index()
+    else:
+       data = data[data['Team Name'] == team]   
+    fig_dims = (9,8)
+    fig, ax = plt.subplots(figsize = fig_dims)
+    sns.barplot(x="Age", y="Points",
+                data=data,
+                ax=ax).set(title=str(team) + ' Fantasy Points by Age Group: ' +str(label))
+    plt.xticks(fontsize=10, rotation=-45)
+    plt.legend(title="", loc='best', fontsize=20)
 
 
 
